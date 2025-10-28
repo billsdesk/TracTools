@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://github.com/billsdesk/TracTools/blob/main/A_banner_image_for_Trac_Management_Utilities_is_di.png?raw=true" 
+       alt="Trac Management Utilities Banner" width="800">
+</p>
+
 # Trac Management Utilities
 
 A collection of scripts and configuration tools that extend and simplify
