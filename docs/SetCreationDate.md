@@ -1,20 +1,20 @@
-##🕓 Ticket Utilities — Set Ticket Creation Date
+## 🕓 Ticket Utilities — Set Ticket Creation Date
 
-###Overview
+### Overview
 
 This utility extends Trac with a command-line feature to update a ticket’s “created” date,
 allowing you to retroactively record historical work or import older issues with accurate timestamps.
 
 It integrates directly into the tracscript management tool (see /TracTools/tracscript).
 
-###🧭 Why You Need It
+### 🧭 Why You Need It
 
 By default, Trac does not allow editing the ticket creation date (time field).
 This is inconvenient when migrating tickets or cataloging past work.
 
 The set-created command provides a simple, safe way to modify that field without breaking Trac’s internal references or attachments.
 
-###⚙️ Usage
+### ⚙️ Usage
 
 ~~~
 tracscript set-created <ticket-id> <YYYY-MM-DD>
@@ -29,7 +29,7 @@ tracscript set-created 17 2024-05-10
 This sets ticket #17’s created date to 2024-05-10 09:00:00 (local time),
 and the timestamp is stored in UTC within the database.
 
-###🔍 Output Example
+### 🔍 Output Example
 🧠 Virtual environment active: /Users/<you>/tracenv
 
 📝 Setting ticket #17 created date to '2024-05-10 09:00:00' ...
@@ -42,7 +42,7 @@ and the timestamp is stored in UTC within the database.
 
 ✅ Updated ticket #17 successfully (stored as UTC)
 
-###🧠 Implementation Notes
+### 🧠 Implementation Notes
 
 The script connects directly to your Trac environment database.
 
@@ -52,7 +52,7 @@ All relationships (comments, attachments, etc.) remain intact — they are keyed
 
 Safe to run while Trac is active (uses transactional update).
 
-###⚡ Advanced Details
+### ⚡ Advanced Details
 
 Internally, the command:
 
@@ -68,7 +68,7 @@ UPDATE ticket SET time = ? WHERE id = ?
 
 Confirms and logs the before/after values.
 
-###🧩 Integration
+### 🧩 Integration
 
 Included as a built-in subcommand of:
 
@@ -82,7 +82,7 @@ To view help:
 tracscript help
 ~~~
 
-###🧾 Summary
+### 🧾 Summary
 
 ✅ Safely updates ticket creation timestamps
 
