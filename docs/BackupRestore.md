@@ -19,7 +19,7 @@ Creates a timestamped archive containing:
 Archives are saved in:
 
 ~~~
-/Volumes/Users/Bill/Trac/TracBackups
+~/Trac/TracBackups
 ~~~
 
 Only the 5 most recent backups are kept automatically.
@@ -27,7 +27,7 @@ Only the 5 most recent backups are kept automatically.
 ### Restore
 
 ~~~
-tracscript restore /path/to/backup.tar.gz
+tracscript restore ~/Trac/backup.tar.gz
 ~~~
 
 Restores only the Trac project (skips restoring the script and tracenv).
