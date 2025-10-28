@@ -48,7 +48,7 @@ tracscript set-created 7 2025-01-01
 Output example:
 
 ~~~
-🧠 Virtual environment active: /Volumes/Users/Bill/tracenv
+🧠 Virtual environment active: ~/tracenv
 📝 Setting ticket #7 created date to '2025-01-01 09:00:00' ...
 ✅ Updated ticket #7: created timestamp changed successfully.
 ~~~
