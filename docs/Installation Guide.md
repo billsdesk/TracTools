@@ -10,7 +10,7 @@
 
 ## 2. Setup
 
-1. Clone your repository into `/Volumes/Users/Bill/Trac`
+1. Clone your repository into `~/Trac`
 2. Create and activate a virtual environment:
 
 ~~~
