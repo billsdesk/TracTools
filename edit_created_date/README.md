@@ -101,7 +101,7 @@ Expected result:
 ~~~
 id | summary | time (microseconds UTC) | changetime
 ---+----------+------------------------+------------
-7  | Test2   | 1761939600000000       | 1761595336875139
+7  | Test2   | 1761939600000000        | 1761595336875139
 ~~~
 
 Then open the ticket in Trac — the tooltip will display your local time, even though it’s stored internally as UTC.
@@ -135,10 +135,12 @@ However, the CLI version (tracscript set-created) is more reliable and does not 
 ### Known Limitations
 
 ~~~
-Limitation	Description	Workaround
-Tooltip may show UTC	Trac internally uses UTC timestamps	Interpreted correctly in most browsers
-Doesn’t change changelog timestamps	Expected behavior — changelog represents history	Leave as-is
-No multi-ticket batch update	Only single-ticket edits supported	Use small shell loops if needed
+Limitation                      Description	Workaround
+Tooltip may show UTC            Trac internally uses UTC timestamps	Interpreted correctly
+                                in most browsers. Doesn’t change changelog timestamps
+                                Expected behavior — changelog represents history	Leave as-is
+No multi-ticket batch update    Only single-ticket edits supported
+                                Use small shell loops if needed
 ~~~
 
 ### Example Automation Loop
