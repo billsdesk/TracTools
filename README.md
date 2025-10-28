@@ -68,11 +68,13 @@ TracTools/
 
 ### 🧩 Components
 
-Component	Purpose
-tracscript	Command-line tool to manage Trac, backups, restores, and timestamps
-html_email_plugin	Enables HTML-formatted email notifications
-edit_created_date	Allows safe modification of ticket “created” timestamps
-docs/	Contains detailed setup and reference documentation
+| Component | Purpose |
+|------------|----------|
+| `tracscript` | Command-line tool to manage Trac, backups, restores, and timestamps |
+| `html_email_plugin` | Enables HTML-formatted email notifications |
+| `edit_created_date` | Allows safe modification of ticket “created” timestamps |
+| `docs` | Contains detailed setup and reference documentation |
+
 
 ### 🧠 Example Workflow
 
