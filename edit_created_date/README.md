@@ -1,4 +1,4 @@
-## Trac HTML Email Plugin
+## Trac Change Ticket Creation Date
 ### Overview
 
 By default, Trac does not allow modification of a ticket’s creation timestamp (time field) after it’s created.
