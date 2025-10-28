@@ -106,31 +106,7 @@ id | summary | time (microseconds UTC) | changetime
 
 Then open the ticket in Trac — the tooltip will display your local time, even though it’s stored internally as UTC.
 
-### Optional: Browser Edit Plugin
 
-If you want to enable in-browser editing (experimental):
-
-Copy the plugin to your Trac project:
-
-~~~
-~/Trac/myproject/plugins/edit_created_date.py
-~~~
-
-Enable it in trac.ini:
-
-~~~
-[components]
-edit_created_date.* = enabled
-~~~
-
-Restart Trac:
-
-~~~
-tracscript restart
-~~~
-
-You’ll then see a small “Edit Created Date” field below the ticket description.
-However, the CLI version (tracscript set-created) is more reliable and does not interfere with the Trac UI rendering pipeline.
 
 ### Known Limitations
 
