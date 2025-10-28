@@ -1,11 +1,11 @@
-##📧 Trac HTML Email Notifications (Updated 2025 Edition)
+## 📧 Trac HTML Email Notifications (Updated 2025 Edition)
 
-###Overview
+### Overview
 
 This enhancement enables beautiful, fully formatted HTML email notifications in Trac.
 It replaces Trac’s default plain-text ticket notifications with HTML emails using a customizable Jinja2 template — no extra plugin required.
 
-###🧩 What’s Included
+### 🧩 What’s Included
 
 notification_email.html — custom HTML email template
 
@@ -13,7 +13,7 @@ Configuration update in trac.ini to point Trac to your template directory
 
 Works seamlessly with Trac’s built-in notification system
 
-###⚙️ Setup Instructions
+### ⚙️ Setup Instructions
 
 Copy the template
 
@@ -33,14 +33,14 @@ templates_dir = /Users/<yourname>/Trac/myproject/templates
 
 💡 If you’re using a relative path, it must be relative to your Trac environment directory (myproject).
 
-###Restart Trac
+### Restart Trac
 Use your helper script to restart:
 
 ~~~
 tracscript restart
 ~~~
 
-###Verify
+### Verify
 
 Create or update a ticket.
 
@@ -48,7 +48,7 @@ You should now receive a rich HTML-formatted email (with inline CSS and clear fo
 
 The subject line, summary, and ticket body all render properly across mail clients (including Apple Mail and Gmail).
 
-###💅 Customization
+### 💅 Customization
 
 You can safely modify the HTML in:
 
@@ -56,7 +56,7 @@ You can safely modify the HTML in:
 myproject/templates/notification_email.html
 ~~~
 
-###Common tweaks:
+### Common tweaks:
 
 Change logo or header style
 
@@ -66,7 +66,7 @@ Add footer signatures or links
 
 Every restart of Trac reloads the updated template automatically.
 
-###🧰 Troubleshooting
+### 🧰 Troubleshooting
 
 Symptom	Fix
 
@@ -82,7 +82,7 @@ Validate that your HTML template is well-formed (no missing tags).
 
 Restart Trac after adding or editing the template.
 
-###🧾 Summary
+### 🧾 Summary
 
 ✅ No Python plugin required
 
