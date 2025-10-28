@@ -1,93 +1,81 @@
-## 📧 Trac HTML Email Notifications (Updated 2025 Edition)
+# ✉️ HTML Email Notifications for Trac
 
-### Overview
+Enhances Trac’s built-in email notification system to send **HTML-formatted** messages instead of plain text.  
+Provides improved readability and better integration with modern email clients.
 
-This enhancement enables beautiful, fully formatted HTML email notifications in Trac.
-It replaces Trac’s default plain-text ticket notifications with HTML emails using a customizable Jinja2 template — no extra plugin required.
+---
 
-### 🧩 What’s Included
+## 🎯 Purpose
 
-notification_email.html — custom HTML email template
+Trac’s default email system sends plaintext updates that can be difficult to read and parse.  
+This enhancement makes notifications more readable by introducing HTML formatting and clear ticket structure.
 
-Configuration update in trac.ini to point Trac to your template directory
+---
 
-Works seamlessly with Trac’s built-in notification system
+## 🧩 Features
 
-### ⚙️ Setup Instructions
+- Clean, readable HTML layout for ticket notifications  
+- Optional inline formatting for status, priority, and component  
+- Customizable subject and footer templates  
+- Fully compatible with Trac’s existing `notification` framework  
 
-Copy the template
+---
 
-Place your custom HTML email template into:
+## 🛠️ Installation
 
-~~~
-/Users/<yourname>/Trac/myproject/templates/notification_email.html
-~~~
+Copy the `html_email_plugin` directory into your Trac project’s `plugins/` folder.
 
-Update your Trac configuration
-Edit your trac.ini and add (or update) the [notification] section:
+Example:
 
-~~~
-[notification]
-templates_dir = /Users/<yourname>/Trac/myproject/templates
-~~~
+```bash
+cp -R html_email_plugin $HOME/Trac/myproject/plugins/
+```
 
-💡 If you’re using a relative path, it must be relative to your Trac environment directory (myproject).
+Restart Trac:
 
-### Restart Trac
-Use your helper script to restart:
-
-~~~
+```bash
 tracscript restart
-~~~
+```
 
-### Verify
+---
 
-Create or update a ticket.
+## ⚙️ Configuration
 
-You should now receive a rich HTML-formatted email (with inline CSS and clear formatting).
+Edit your `trac.ini` file:
 
-The subject line, summary, and ticket body all render properly across mail clients (including Apple Mail and Gmail).
+```ini
+[notification]
+mime_encoding = base64
+email_format = html
+```
 
-### 💅 Customization
+You can further customize the templates in:
 
-You can safely modify the HTML in:
+```
+$HOME/Trac/myproject/templates/html_notification.html
+```
 
-~~~
-myproject/templates/notification_email.html
-~~~
+---
 
-### Common tweaks:
+## 🧾 Example Output
 
-Change logo or header style
+A typical ticket update email includes:
 
-Adjust colors or fonts
+- Ticket ID, summary, and description  
+- Status, priority, and milestone  
+- Diff-styled change highlights  
+- Links back to the Trac web UI  
 
-Add footer signatures or links
+---
 
-Every restart of Trac reloads the updated template automatically.
+## 💡 Notes
 
-### 🧰 Troubleshooting
+| Limitation | Description | Workaround |
+|-------------|--------------|-------------|
+| HTML rendering may vary | Email clients interpret HTML differently | Test with common clients (Mail, Outlook, Gmail) |
+| Inline CSS only | External stylesheets not supported | Modify embedded `<style>` in template |
 
-Symptom	Fix
+---
 
-* “EmailDistributor format text/html not available”
-
-Ensure [notification] templates_dir points to the correct directory.
-
-* Emails show as blank
-
-Validate that your HTML template is well-formed (no missing tags).
-
-* Still sending plain text
-
-Restart Trac after adding or editing the template.
-
-### 🧾 Summary
-
-✅ No Python plugin required
-
-✅ Compatible with Trac 1.6+ and Python 3.12+
-
-✅ Template-driven and easily customizable
-
-✅ Tested with Apple Mail, Gmail, and Outlook
+**Author:** Bill Stackhouse  
+**Part of:** [TracTools](https://github.com/billsdesk/TracTools)
