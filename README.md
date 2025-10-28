@@ -34,6 +34,16 @@ Includes:
 
 ---
 
+## 📚 Documentation
+
+| Topic | Description |
+|-------|--------------|
+| [Installation Guide](docs/InstallationGuide.md) | Step-by-step setup for TracTools and dependencies |
+| [Backup & Restore](docs/BackupRestore.md) | Backing up and restoring your Trac environment safely |
+| [Set Created Date](docs/SetCreatedDate.md) | Change a ticket’s creation timestamp |
+| [HTML Email Plugin](docs/HTML_Email_Plugin.md) | Enable HTML-formatted Trac notifications |
+| [Docs Overview](docs/README.md) | Index of all documentation in this project |
+
 ## ⚙️ Requirements
 
 - macOS or Linux  
