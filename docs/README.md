@@ -1,6 +1,8 @@
 # 📘 TracTools Documentation
 
-Supporting documents for the **Trac Management Utilities** project.
+Supporting documents for setup, operation, and reference.
+
+Each guide focuses on a specific TracTools component or task.
 
 ---
 
@@ -15,14 +17,7 @@ Supporting documents for the **Trac Management Utilities** project.
 
 ---
 
-## 🧭 Tips
+🧭 **Navigation:**  
+Return to the main project overview → [TracTools README](../README.md)
 
-- All paths assume your Trac project lives under `$HOME/Trac/`.
-- Be sure to activate your virtual environment (`tracenv`) before manual Trac operations.
-- Use `$HOME` in configs for portability instead of `/Users/<name>`.
-
----
-
-**Part of:** [TracTools](https://github.com/billsdesk/TracTools)  
-**Author:** Bill Stackhouse  
-*“Making Trac simpler, faster, and more maintainable.”*
+📄 *License:* BSD 3-Clause  
