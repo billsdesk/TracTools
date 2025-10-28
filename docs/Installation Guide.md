@@ -1,49 +1,95 @@
+# ⚙️ Installation Guide
 
-# Installation Guide
+This guide explains how to install and configure **Trac Management Utilities** on macOS or Linux.
 
-## 1. Prerequisites
+---
 
-- Python 3.12+
-- Trac 1.6
-- SQLite (default Trac backend)
-- Genshi (`pip install genshi`)
+## 🧩 Requirements
 
-## 2. Setup
+- macOS or Linux  
+- Python ≥ 3.12  
+- Trac 1.6  
+- SQLite backend  
+- Genshi (for HTML templates)  
+- A configured Trac environment (`tracd` compatible)
 
-1. Clone your repository into `~/Trac`
-2. Create and activate a virtual environment:
+---
 
-~~~
-   python3 -m venv ~/tracenv
-   source ~/tracenv/bin/activate
-   pip install Trac genshi
-~~~
+## 🪄 Setup Steps
 
-## 3. Create your Trac project:
+### 1. Clone the Repository
 
-~~~
-trac-admin ~/Trac/myproject initenv
-~~~
+```bash
+git clone https://github.com/billsdesk/TracTools.git
+cd TracTools
+```
 
-## 4. Add configuration file:
+---
 
-~~~
-cat > ~/Trac/TracConfig <<EOF
+### 2. Set Up the Virtual Environment
+
+```bash
+python3 -m venv $HOME/tracenv
+source $HOME/tracenv/bin/activate
+pip install trac genshi
+```
+
+---
+
+### 3. Create Your Trac Environment
+
+```bash
+trac-admin $HOME/Trac/myproject initenv
+```
+
+---
+
+### 4. Configure TracScript
+
+In your Trac project directory, create a file named `TracConfig`:
+
+```bash
 TRAC_PROJECT_PATH=$HOME/Trac/myproject
 VENV_PATH=$HOME/tracenv
 BACKUP_PATH=$HOME/Trac/TracBackups
 PORT=8080
-EOF
-~~~
+```
 
-## 5. Make the script executable:
+---
 
-~~~
-chmod +x ~/Trac/scripts/tracscript
-~~~
+### 5. Run TracScript Commands
 
-## 6. Start Trac:
+Start your Trac instance:
 
-~~~
-~/Trac/scripts/tracscript start
-~~~
+```bash
+tracscript start
+```
+
+Make a backup:
+
+```bash
+tracscript backup
+```
+
+Change a ticket creation date:
+
+```bash
+tracscript set-created 7 2025-01-01
+```
+
+---
+
+## ✅ Verification
+
+Visit your Trac instance in a browser:
+
+```
+http://127.0.0.1:8080/
+```
+
+You should see your environment loaded and ready.
+
+---
+
+**Author:** Bill Stackhouse  
+**Part of:** [TracTools](https://github.com/billsdesk/TracTools)
