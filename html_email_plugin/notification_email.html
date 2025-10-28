@@ -1,0 +1,64 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #222;
+        background: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        background: #ffffff;
+        margin: 2em auto;
+        padding: 1.5em 2em;
+        max-width: 700px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      h2 { color: #005a9c; margin-top: 0; }
+      .meta { font-size: 0.9em; color: #555; margin-bottom: 1em; }
+      .section-title {
+        font-weight: bold; border-bottom: 1px solid #ddd;
+        margin-top: 1.5em; padding-bottom: 0.3em;
+      }
+      .description {
+        background: #fafafa; border-left: 4px solid #005a9c;
+        padding: 1em; margin-top: 0.5em; white-space: pre-wrap;
+      }
+      a { color: #005a9c; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Trac Ticket #${ticket.id}: ${ticket.summary}</h2>
+
+      <div class="meta">
+        <div><strong>Reporter:</strong> ${ticket.reporter}</div>
+        <div><strong>Owner:</strong> ${ticket.owner}</div>
+        <div><strong>Status:</strong> ${ticket.status}</div>
+        <div><strong>Priority:</strong> ${ticket.priority}</div>
+        <div><strong>Milestone:</strong> ${ticket.milestone}</div>
+      </div>
+
+      <div class="section-title">Description</div>
+      <div class="description">${ticket.description}</div>
+
+      <div class="section-title">Link</div>
+      <div>
+        <a href="http://127.0.0.1:8080/ticket/${ticket.id}">
+          View this ticket in Trac
+        </a>
+      </div>
+
+      <p style="margin-top:2em; font-size:0.8em; color:#777;">
+        This email was generated automatically by Trac.
+      </p>
+    </div>
+  </body>
+</html>
