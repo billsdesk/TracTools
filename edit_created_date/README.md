@@ -168,7 +168,7 @@ After a successful edit:
 
 ~~~
 03:45:13 ~: tracscript set-created 7 2025-01-01
-🧠 Virtual environment active: /Volumes/Users/Bill/tracenv
+🧠 Virtual environment active: /Volumes/Users/<user>/tracenv
 📝 Setting ticket #7 created date to '2025-01-01 09:00:00' ...
 ✅ Updated ticket #7: created timestamp changed successfully.
 ~~~
