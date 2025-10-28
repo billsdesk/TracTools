@@ -1,0 +1,209 @@
+#!/bin/bash
+# ===============================================
+# tracscript - Helper for managing a local Trac instance
+# Author: Bill Stackhouse
+# Version: 2.0
+# ===============================================
+
+# Load configuration
+CONFIG_FILE="$HOME/Trac/TracConfig"
+# Normalize paths to full form
+TRAC_PROJECT_PATH=$(eval echo "$TRAC_PROJECT_PATH")
+VENV_PATH=$(eval echo "$VENV_PATH")
+BACKUP_PATH=$(eval echo "$BACKUP_PATH")
+
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  echo "⚠️  Config file not found at $CONFIG_FILE"
+  echo "Please create it with contents like:"
+  echo "  TRAC_PROJECT_PATH=$TRAC_PROJECT_PATH"
+  echo "  VENV_PATH=$HOME/tracenv"
+  echo "  BACKUP_PATH=$HOME/Trac/TracBackups"
+  echo "  PORT=8080"
+  exit 1
+fi
+source "$CONFIG_FILE"
+
+# Activate Python virtual environment
+activate_venv() {
+  if [[ -n "$VENV_PATH" && -d "$VENV_PATH" ]]; then
+    source "$VENV_PATH/bin/activate"
+    echo "🧠 Virtual environment active: $VENV_PATH"
+  else
+    echo "⚠️  Virtual environment not found at $VENV_PATH"
+    exit 1
+  fi
+}
+
+# Start Trac server
+start_trac() {
+  activate_venv
+  echo "🚀 Starting Trac on port ${PORT:-8080}..."
+
+  # Suppress pkg_resources warning globally
+  export PYTHONWARNINGS="ignore:::pkg_resources"
+
+  # Start tracd, filtering any remaining pkg_resources noise
+  "$VENV_PATH/bin/python3" -W ignore:::pkg_resources -m trac.web.standalone \
+    --port ${PORT:-8080} \
+    --basic-auth=myproject,${TRAC_PROJECT_PATH}/.htpasswd,. \
+    "${TRAC_PROJECT_PATH}" 2> >(grep -v "pkg_resources" >&2) &
+
+  sleep 1
+  PID=$!
+  echo $PID > "${TRAC_PROJECT_PATH}/tracd.pid"
+  echo "✅ Started Trac (PID $PID) → http://127.0.0.1:${PORT:-8080}/"
+}
+
+# Stop Trac server
+stop_trac() {
+  PID_FILE="${TRAC_PROJECT_PATH}/tracd.pid"
+  if [[ -f "$PID_FILE" ]]; then
+    PID=$(cat "$PID_FILE")
+    echo "🛑 Stopping Trac (PID $PID)..."
+    kill "$PID" 2>/dev/null && echo "✅ Trac stopped." || echo "⚠️  Failed to stop Trac."
+    rm -f "$PID_FILE"
+  else
+    echo "⚠️  No PID file found."
+  fi
+}
+
+# Restart Trac server
+restart_trac() {
+  echo "🔄 Restarting Trac..."
+  stop_trac
+  start_trac
+}
+
+# Backup Trac project (includes tracscript + venv)
+backup_trac() {
+  activate_venv
+  TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+  mkdir -p "$BACKUP_PATH"
+
+  BACKUP_FILE="${BACKUP_PATH}/${TIMESTAMP}-TracBackup.tar.gz"
+  echo "💾 Creating backup at ${BACKUP_FILE} ..."
+
+  SCRIPT_PATH="$(realpath "$0")"
+
+  # Back up project + tracenv + script
+  tar -czf "$BACKUP_FILE" \
+    -C "$(dirname "$TRAC_PROJECT_PATH")" "$(basename "$TRAC_PROJECT_PATH")" \
+    -C "$(dirname "$VENV_PATH")" "$(basename "$VENV_PATH")" \
+    -C "$(dirname "$SCRIPT_PATH")" "$(basename "$SCRIPT_PATH")" \
+    2>/dev/null
+
+  echo "✅ Backup complete: $BACKUP_FILE"
+
+  # Keep only the 5 most recent backups
+  echo "🧹 Pruning old backups (keeping 5 most recent)..."
+  ls -tp "$BACKUP_PATH"/*.tar.gz 2>/dev/null | tail -n +6 | while read -r f; do
+    echo "   🗑️  Removing $f"
+    rm -f "$f"
+  done
+}
+
+# Restore Trac project (excluding venv + script)
+restore_trac() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: tracscript restore <backup-file>"
+    exit 1
+  fi
+  BACKUP_FILE="$1"
+
+  echo "♻️  Restoring backup from $BACKUP_FILE ..."
+  if [[ ! -f "$BACKUP_FILE" ]]; then
+    echo "❌ Backup file not found: $BACKUP_FILE"
+    exit 1
+  fi
+
+  # Extract only the Trac project directory
+  tar --exclude="*tracenv*" \
+      --exclude="$(basename "$0")" \
+      -xzf "$BACKUP_FILE" -C "$(dirname "$TRAC_PROJECT_PATH")"
+  echo "✅ Restore complete (excluded tracenv and script)."
+}
+
+# Update ticket creation date
+set_created() {
+  activate_venv
+  if [[ $# -lt 2 ]]; then
+    echo "Usage: tracscript set-created <ticket-id> <YYYY-MM-DD>"
+    exit 1
+  fi
+  local ticket_id="$1"
+  local date_input="$2"
+  local datetime_str="${date_input} 09:00:00"
+
+  echo "📝 Setting ticket #${ticket_id} created date to '${datetime_str}' ..."
+
+  python3 -W ignore <<PYCODE
+import os
+from datetime import datetime, timezone
+from trac.env import Environment
+from trac.util.datefmt import to_utimestamp, from_utimestamp, localtz
+
+env_path = os.getenv("TRAC_PROJECT_PATH")
+if not env_path or not os.path.isdir(env_path):
+    raise FileNotFoundError(f"Trac environment not found at {env_path or '(unset)'}")
+
+print(f"📂 Using Trac environment at: {env_path}")
+env = Environment(env_path)
+
+with env.db_query as db:
+    cursor = db.cursor()
+    cursor.execute("SELECT time FROM ticket WHERE id=%s", (${ticket_id},))
+    row = cursor.fetchone()
+    if not row:
+        raise ValueError(f"Ticket #{${ticket_id}} not found.")
+    old_ts = row[0]
+    old_dt_utc = from_utimestamp(old_ts)
+    old_dt_local = old_dt_utc.astimezone(localtz)
+    print(f"🕓 Previous created date: {old_dt_local.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+
+new_dt_local = datetime.strptime("${datetime_str}", "%Y-%m-%d %H:%M:%S").astimezone(localtz)
+new_dt_utc = new_dt_local.astimezone(timezone.utc)
+new_ts = to_utimestamp(new_dt_utc)
+
+with env.db_transaction as db:
+    cursor = db.cursor()
+    cursor.execute("UPDATE ticket SET time=%s WHERE id=%s", (new_ts, ${ticket_id}))
+
+print(f"✅ Updated created date → {new_dt_local.strftime('%Y-%m-%d %H:%M:%S %Z')} (stored as UTC)")
+PYCODE
+}
+
+# Help
+show_help() {
+cat <<EOF
+Usage: tracscript <command>
+
+Commands:
+  start             Start the Trac server
+  stop              Stop the Trac server
+  restart           Restart the Trac server
+  backup            Create a timestamped backup (includes script + venv)
+  restore <file>    Restore from backup (excludes script + venv)
+  set-created <id> <YYYY-MM-DD>
+                    Update the 'created' date of a ticket (defaults to 09:00)
+  help              Show this help message
+
+Config file:
+  TracConfig (in ~/Trac)
+    TRAC_PROJECT_PATH=$HOME/Trac/myproject
+    VENV_PATH=$HOME/tracenv
+    BACKUP_PATH=$HOME/Trac/TracBackups
+    PORT=8080
+EOF
+}
+
+# Command dispatcher
+case "$1" in
+  start) start_trac ;;
+  stop) stop_trac ;;
+  restart) restart_trac ;;
+  backup) backup_trac ;;
+  restore) restore_trac "$2" ;;
+  set-created) shift; set_created "$@" ;;
+  help|--help|-h|"") show_help ;;
+  *) echo "❌ Unknown command: $1"; show_help ;;
+esac
