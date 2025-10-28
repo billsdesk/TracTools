@@ -9,6 +9,18 @@
   Simplifying <a href="https://trac.edgewall.org/">Trac</a> administration for single-user and local environments.
 </p>
 
+<p align="center">
+  <a href="https://github.com/billsdesk/TracTools/stargazers">
+    <img src="https://img.shields.io/github/stars/billsdesk/TracTools?style=flat-square" alt="Stars">
+  </a>
+  <a href="https://github.com/billsdesk/TracTools/issues">
+    <img src="https://img.shields.io/github/issues/billsdesk/TracTools?style=flat-square" alt="Issues">
+  </a>
+  <a href="https://github.com/billsdesk/TracTools/blob/main/LICENSE.md">
+    <img src="https://img.shields.io/badge/License-BSD%203--Clause-blue?style=flat-square" alt="License">
+  </a>
+</p>
+
 ---
 
 ## 🧰 Overview
