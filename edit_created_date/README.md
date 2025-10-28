@@ -134,14 +134,12 @@ However, the CLI version (tracscript set-created) is more reliable and does not 
 
 ### Known Limitations
 
-~~~
-Limitation                      Description	Workaround
-Tooltip may show UTC            Trac internally uses UTC timestamps	Interpreted correctly
-                                in most browsers. Doesn’t change changelog timestamps
-                                Expected behavior — changelog represents history	Leave as-is
-No multi-ticket batch update    Only single-ticket edits supported
-                                Use small shell loops if needed
-~~~
+| Limitation | Description | Workaround |
+|-------------|--------------|-------------|
+| Tooltip may show UTC | Trac internally uses UTC timestamps | Interpreted correctly in most browsers |
+| Doesn’t change changelog timestamps | Expected behavior — changelog represents history | Leave as-is |
+| No multi-ticket batch update | Only single-ticket edits supported | Use small shell loops if needed |
+
 
 ### Example Automation Loop
 
@@ -155,11 +153,11 @@ done
 
 ### Troubleshooting
 
-~~~
-Issue	Cause	Fix
-can't subtract offset-naive and offset-aware datetimes	Mixing timezone-aware and naive datetimes	Ensure .astimezone(timezone.utc) is used
-sqlite3.OperationalError: database is locked	Trac is actively serving requests	Stop Trac before editing: tracscript stop
-~~~
+| Issue | Cause | Fix |
+|--------|--------|-----|
+| `can't subtract offset-naive and offset-aware datetimes` | Mixing timezone-aware and naive datetimes | Ensure `.astimezone(timezone.utc)` is used |
+| `sqlite3.OperationalError: database is locked` | Trac is actively serving requests | Stop Trac before editing: `tracscript stop` |
+
 
 Changes not showing	Cached page	Refresh ticket page or clear browser cache
 
