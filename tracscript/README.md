@@ -28,3 +28,16 @@ It’s designed to make Trac administration Mac-friendly and maintainable, witho
 
 `tracscript` reads its configuration from a simple text file named:
 
+~~~
+~/Trac/TracConfig
+~~~
+
+Example contents:
+
+~~~
+# Trac configuration for tracscript
+TRAC_PROJECT_PATH=$HOME/Trac/myproject
+VENV_PATH=$HOME/tracenv
+BACKUP_PATH=$HOME/Trac/TracBackups
+PORT=8080
+~~~
