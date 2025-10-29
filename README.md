@@ -38,7 +38,8 @@ Includes:
 ## ✨ Features
 
 - HTML-formatted ticket notifications  
-- Change ticket **created date** safely  
+- Change ticket **created date** safely
+- Delete button on Ticket window
 - Automated backups (with retention)  
 - Simple restore workflow  
 - Local timezone handling  
