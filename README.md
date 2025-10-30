@@ -242,7 +242,7 @@ Example:
 |----------|-------------|
 | `tracserve set-created <ids> <YYYY-MM-DD>` | Update ticket “created” date(s) and log the change |
 | `tracserve delete <ids>` | Delete ticket(s) safely and log the deletion |
-| `tracserve view-log [trac|tracserve] [N]` | View logs from either tracserve or Trac |
+| `tracserve view-log [trac\|tracserve] [N]` | View logs from either tracserve or Trac |
 | `tracserve backup` | Create a timestamped backup with automatic retention |
 | `tracserve restore <file>` | Restore safely without overwriting your environment |
 
