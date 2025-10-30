@@ -176,11 +176,30 @@ backup_trac() {
     local backup_file="$BACKUP_PATH/$backup_name"
 
     echo "💾 Creating backup at $backup_file ..."
-    tar -czf "$backup_file" -C "$TRAC_PROJECT_PATH/.." "$(basename "$TRAC_PROJECT_PATH")" "$CONFIG_FILE" "$(basename "$0")" >/dev/null 2>&1
-    echo "✅ Backup complete: $backup_file"
 
+    # Work inside parent directory of Trac (so everything inside Trac/ is relative)
+    (
+        cd "$HOME" || exit 1
+
+        # Ensure all expected components exist
+        [[ -d "Trac/myproject" ]] || { echo "❌ Trac project not found at ~/Trac/myproject"; exit 1; }
+        [[ -f "Trac/TracConfig" ]] || { echo "⚠️  Missing TracConfig — skipping."; }
+        [[ -d "Trac/tracenv" ]] || echo "⚠️  No virtual environment found — skipping."
+        [[ -x "bin/tracserve" ]] || echo "⚠️  tracserve script not found — skipping."
+
+        # Create tarball from relative paths only
+        tar -czf "$backup_file" \
+            "Trac/myproject" \
+            "Trac/TracConfig" \
+            "Trac/tracenv" \
+            "bin/tracserve" \
+            --ignore-failed-read \
+            >/dev/null 2>&1
+    )
+
+    echo "✅ Backup complete: $backup_file"
     echo "🧹 Pruning old backups (keeping 5 most recent)..."
-    ls -tp "$BACKUP_PATH"/*.tar.gz | tail -n +6 | xargs -I {} rm -- {}
+    ls -tp "$BACKUP_PATH"/*.tar.gz 2>/dev/null | tail -n +6 | xargs -I {} rm -- {}
 }
 
 restore_trac() {
