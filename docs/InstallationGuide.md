@@ -1,95 +1,176 @@
-# ⚙️ Installation Guide
+# 🛠️ Installation Guide — TracServe and Trac Management Utilities
 
-This guide explains how to install and configure **Trac Management Utilities** on macOS or Linux.
-
----
-
-## 🧩 Requirements
-
-- macOS or Linux  
-- Python ≥ 3.12  
-- Trac 1.6  
-- SQLite backend  
-- Genshi (for HTML templates)  
-- A configured Trac environment (`tracd` compatible)
+This guide explains how to install, configure, and use **TracServe** and related tools for managing your local Trac environment.
 
 ---
 
-## 🪄 Setup Steps
+## 📋 Prerequisites
+
+Ensure the following are installed on your system:
+
+| Requirement | Minimum Version | Notes |
+|--------------|-----------------|--------|
+| macOS or Linux | — | Tested on macOS 14+ |
+| Python | 3.12+ | Use `python3 --version` to verify |
+| Trac | 1.6 | Installed via pip inside virtual environment |
+| Genshi | — | Required for HTML templates |
+| SQLite | — | Default Trac backend supported |
+
+---
+
+## 📦 Installation Steps
 
 ### 1. Clone the Repository
 
 ```bash
+cd ~/Trac
 git clone https://github.com/billsdesk/TracTools.git
-cd TracTools
+```
+
+This creates:
+
+```
+~/Trac/TracTools/
 ```
 
 ---
 
-### 2. Set Up the Virtual Environment
+### 2. Create Your Trac Environment
+
+If you don’t already have a Trac project, create one:
 
 ```bash
-python3 -m venv $HOME/tracenv
-source $HOME/tracenv/bin/activate
+mkdir -p ~/Trac/myproject
+cd ~/Trac/myproject
+trac-admin . initenv "My Project" sqlite:db/trac.db
+```
+
+---
+
+### 3. Set Up a Python Virtual Environment
+
+```bash
+cd ~/Trac
+python3 -m venv tracenv
+source tracenv/bin/activate
 pip install trac genshi
 ```
 
----
-
-### 3. Create Your Trac Environment
+💡 You can confirm Trac is installed correctly:
 
 ```bash
-trac-admin $HOME/Trac/myproject initenv
+tracd --version
 ```
 
 ---
 
-### 4. Configure TracScript
+### 4. Configure TracServe
 
-In your Trac project directory, create a file named `TracConfig`:
+Create a file named `TracConfig` in your Trac project directory:
 
 ```bash
+nano ~/Trac/TracConfig
+```
+
+Add the following content:
+
+```bash
+# Trac configuration for tracserve
 TRAC_PROJECT_PATH=$HOME/Trac/myproject
 VENV_PATH=$HOME/tracenv
 BACKUP_PATH=$HOME/Trac/TracBackups
 PORT=8080
 ```
 
----
-
-### 5. Run TracScript Commands
-
-Start your Trac instance:
-
-```bash
-tracscript start
-```
-
-Make a backup:
-
-```bash
-tracscript backup
-```
-
-Change a ticket creation date:
-
-```bash
-tracscript set-created 7 2025-01-01
-```
+Save and exit (`Ctrl+O`, `Enter`, `Ctrl+X`).
 
 ---
 
-## ✅ Verification
+### 5. Test TracServe
 
-Visit your Trac instance in a browser:
+Run the following from your TracTools directory:
+
+```bash
+cd ~/Trac/TracTools
+./tracserve start
+```
+
+You should see:
 
 ```
-http://127.0.0.1:8080/
+🧠 Virtual environment active: /Users/you/tracenv
+🚀 Starting Trac on port 8080...
+✅ Started Trac (PID 12345) → http://127.0.0.1:8080/
 ```
 
-You should see your environment loaded and ready.
+Open your browser and visit:
+
+👉 [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
 
 ---
 
-**Author:** Bill Stackhouse  
-**Part of:** [TracTools](https://github.com/billsdesk/TracTools)
+### 6. Stop or Restart Trac
+
+```bash
+tracserve stop
+tracserve restart
+```
+
+Example output:
+
+```
+🔄 Restarting Trac...
+🛑 Stopping Trac...
+✅ Trac stopped.
+🚀 Starting Trac on port 8080...
+✅ Started Trac (PID 67890) → http://127.0.0.1:8080/
+```
+
+---
+
+## 🧠 Environment Layout
+
+```
+~/Trac/
+├── myproject/               ← Your Trac environment
+├── tracenv/                 ← Python virtual environment
+├── TracBackups/             ← Backup storage
+└── TracTools/               ← Management tools (tracserve, plugins, docs)
+```
+
+---
+
+## 🧩 Optional Enhancements
+
+| Feature | Description | Documentation |
+|----------|--------------|----------------|
+| HTML Email Plugin | Enables HTML-formatted Trac notifications | [HTML Email Plugin](HTML_Email_Plugin.md) |
+| Backup & Restore | Automatic timestamped Trac backups | [Backup & Restore](BackupRestore.md) |
+| Created Date Editor | Adjust ticket creation dates easily | [TracServe Guide](TracServe.md) |
+
+---
+
+## ✅ Verification Checklist
+
+- [x] Virtual environment created (`~/Trac/tracenv`)  
+- [x] `TracConfig` file present in `~/Trac/`  
+- [x] TracServe runs without errors  
+- [x] Backup and restore tested successfully  
+- [x] Accessible via browser at `http://127.0.0.1:8080`  
+
+---
+
+## 🗒️ Notes
+
+If you encounter errors like:
+```
+sqlite3.OperationalError: database is locked
+```
+Stop Trac before editing tickets or running `backup` or `restore` commands.
+
+---
+
+### 📚 Related Documentation
+- [TracServe Command Reference](TracServe.md)
+- [Backup & Restore](BackupRestore.md)
+- [HTML Email Plugin](HTML_Email_Plugin.md)
