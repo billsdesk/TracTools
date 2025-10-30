@@ -105,6 +105,34 @@ tracserve start
 
 ---
 
+# 💾 Backup and Restore Behavior
+
+Backups created by `tracserve backup` include all essential Trac components for a complete local restore.
+
+| Item | Included in Backup | Restored | Destination | Notes |
+|------|--------------------|-----------|--------------|-------|
+| `Trac/myproject/` | ✅ | ✅ | `~/Trac/myproject/` | Core Trac project files, database, attachments, etc. |
+| `Trac/TracConfig` | ✅ | ✅ | `~/Trac/TracConfig` | Trac configuration used by `tracserve` |
+| `Trac/bin/tracserve` | ✅ | ✅ | `~/bin/tracserve` | CLI tool is restored directly into your PATH for convenience |
+| `Trac/tracenv/` | ✅ | 🚫 | *(not restored)* | Skipped for safety — prevents Python venv conflicts |
+| `tracserve.log` | 🚫 | 🚫 | *(ignored)* | Runtime log, not needed for restore |
+
+After a restore, you can immediately restart Trac using:
+
+```bash
+tracserve restart
+```
+
+💡 **Tip:**  
+If you prefer to keep `tracserve` self-contained, you can move it manually:
+
+```bash
+mv ~/bin/tracserve ~/Trac/bin/tracserve
+ln -sf ~/Trac/bin/tracserve ~/bin/tracserve
+```
+
+This preserves the documented GitHub layout while maintaining easy command-line access.
+
 ## 📚 Related Documentation
 
 - [TracServe Command Reference](TracServe.md)
