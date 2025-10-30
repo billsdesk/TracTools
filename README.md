@@ -79,11 +79,14 @@ Includes:
 │   ├── templates/
 │   └── TracConfig
 ├── tracenv/                 ← Python virtual environment
-├── TracBackups/             ← Backup directory
-└── bin/                     ← tracserve script location
+└── TracBackups/             ← Backup directory
+
+~/bin/
+└── tracserve                ← Management script (in your PATH)
 ```
 
-> Ensure `~/bin/` is part of your `$PATH` so `tracserve` can be executed from anywhere.
+> `~/bin/tracserve` is not included in automatic backups.  
+> Keep a copy in version control (e.g., GitHub) or back it up manually.
 
 ---
 
