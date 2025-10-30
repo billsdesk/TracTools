@@ -1,82 +1,166 @@
+# ✉️ HTML Email Plugin — Trac Notification Enhancements
 
-# ✉️ HTML Email Notifications for Trac
-
-Enhances Trac’s built-in email notification system to send **HTML-formatted** messages instead of plain text.  
-Provides improved readability and better integration with modern email clients.
-
----
-
-## 🎯 Purpose
-
-Trac’s default email system sends plaintext updates that can be difficult to read and parse.  
-This enhancement makes notifications more readable by introducing HTML formatting and clear ticket structure.
+This guide explains how to enable and customize **HTML-formatted email notifications** in your Trac installation.  
+The plugin replaces Trac’s default plain-text notifications with clean, modern, and styled HTML templates.
 
 ---
 
-## 🧩 Features
+## 🧰 Overview
 
-- Clean, readable HTML layout for ticket notifications  
-- Optional inline formatting for status, priority, and component  
-- Customizable subject and footer templates  
-- Fully compatible with Trac’s existing `notification` framework  
+Trac’s default notifications are plain text and difficult to read.  
+This enhancement uses **Genshi templates** to produce structured HTML emails that display better across clients.
+
+### ✨ Features
+- Styled, readable ticket update emails
+- Clickable links to tickets and attachments
+- Compatible with Trac 1.6+
+- Easy to customize or extend
 
 ---
 
-## 🛠️ Installation
+## ⚙️ Requirements
 
-Copy the `html_email_plugin` directory into your Trac project’s `plugins/` folder.
+| Dependency | Minimum Version | Notes |
+|-------------|------------------|--------|
+| Trac | 1.6 | Must be installed in your virtual environment |
+| Genshi | — | Required for HTML templating |
+| Python | 3.12+ | Compatible with Trac 1.6 |
 
-Example:
+---
 
-```bash
-cp -R html_email_plugin $HOME/Trac/myproject/plugins/
+## 📁 Installation
+
+### 1. Copy the Plugin
+
+Place the plugin’s Python file in your project’s `plugins` directory:
+
+```
+~/Trac/myproject/plugins/html_email_plugin.py
 ```
 
-Restart Trac:
+If the directory doesn’t exist, create it:
 
 ```bash
-tracscript restart
+mkdir -p ~/Trac/myproject/plugins
 ```
 
 ---
 
-## ⚙️ Configuration
+### 2. Add the HTML Template
 
-Edit your `trac.ini` file:
+Place the corresponding Genshi template file in your templates directory:
+
+```
+~/Trac/myproject/templates/ticket_email.html
+```
+
+Example minimal template:
+
+```html
+<html>
+  <body style="font-family: Arial, sans-serif;">
+    <h2>Ticket #${ticket.id}: ${ticket.summary}</h2>
+    <p><b>Status:</b> ${ticket.status}</p>
+    <p><b>Priority:</b> ${ticket.priority}</p>
+    <hr>
+    <p>${ticket.description}</p>
+    <hr>
+    <p><i>Updated by ${author}</i></p>
+  </body>
+</html>
+```
+
+---
+
+### 3. Enable the Plugin in `trac.ini`
+
+Open your Trac configuration file:
+
+```bash
+nano ~/Trac/myproject/conf/trac.ini
+```
+
+Under the `[components]` section, enable the plugin:
+
+```ini
+[components]
+html_email_plugin.* = enabled
+```
+
+Under `[notification]`, set Trac to use HTML formatting:
 
 ```ini
 [notification]
-mime_encoding = base64
 email_format = html
-```
-
-You can further customize the templates in:
-
-```
-$HOME/Trac/myproject/templates/html_notification.html
+template_dir = /Users/you/Trac/myproject/templates
 ```
 
 ---
 
-## 🧾 Example Output
+### 4. Restart Trac
 
-A typical ticket update email includes:
+```bash
+tracserve restart
+```
 
-- Ticket ID, summary, and description  
-- Status, priority, and milestone  
-- Diff-styled change highlights  
-- Links back to the Trac web UI  
-
----
-
-## 💡 Notes
-
-| Limitation | Description | Workaround |
-|-------------|--------------|-------------|
-| HTML rendering may vary | Email clients interpret HTML differently | Test with common clients (Mail, Outlook, Gmail) |
-| Inline CSS only | External stylesheets not supported | Modify embedded `<style>` in template |
+You should now receive HTML-formatted notifications for ticket creation, updates, and comments.
 
 ---
 
-**Author:** Bill Stackhouse  
-**Part of:** [TracTools](https://github.com/billsdesk/TracTools)
+## 🧪 Testing
+
+You can trigger a test notification manually using:
+
+```bash
+trac-admin ~/Trac/myproject notify ticket 1
+```
+
+Or by editing an existing ticket in your browser.
+
+---
+
+## 🎨 Customization
+
+You can modify `ticket_email.html` freely — Trac passes variables like:
+
+| Variable | Description |
+|-----------|--------------|
+| `${ticket.id}` | Ticket ID number |
+| `${ticket.summary}` | Ticket title |
+| `${ticket.description}` | Ticket description |
+| `${ticket.status}` | Ticket status (“new”, “closed”, etc.) |
+| `${ticket.priority}` | Ticket priority |
+| `${author}` | The user making the change |
+
+---
+
+## 📬 Example Output
+
+**Subject:** `[Trac] Ticket #42 updated: Database Connection Error`
+
+**Body (HTML email):**
+```html
+<h2>Ticket #42: Database Connection Error</h2>
+<p><b>Status:</b> Assigned<br>
+<b>Priority:</b> Major</p>
+<hr>
+<p>Investigate SQLite lock issues when running concurrent tests.</p>
+<p><i>Updated by Bill Stackhouse</i></p>
+```
+
+---
+
+## 🧾 Summary
+
+✅ Modern, HTML-styled Trac notifications  
+✅ Easy integration — no external dependencies  
+✅ Full control via HTML templates  
+✅ Compatible with all modern email clients  
+
+---
+
+### 📚 Related Documentation
+
+- [TracServe Command Reference](TracServe.md)
+- [Backup & Restore](BackupRestore.md)
+- [Installation Guide](InstallationGuide.md)
