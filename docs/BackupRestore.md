@@ -23,12 +23,19 @@ This ensures faster operation and avoids dependency conflicts during restoration
 
 ```
 ~/Trac/
-├── myproject/               ← Your active Trac environment
-├── tracenv/                 ← Python virtual environment (not backed up)
-├── TracBackups/             ← Backup storage location
-└── TracTools/
-    └── tracserve
+├── myproject/               ← Your Trac environment
+│   ├── conf/
+│   ├── db/
+│   ├── log/
+│   ├── templates/
+│   └── TracConfig
+├── tracenv/                 ← Python virtual environment
+└── TracBackups/             ← Backup directory
+
+~/bin/
+└── tracserve                ← Management script (in your PATH)
 ```
+
 
 ---
 
