@@ -1,78 +1,105 @@
-# 💾 Backup and Restore Guide
+# 💾 Backup & Restore — TracServe Utility
 
-This document explains how to **back up** and **restore** your Trac environment using the `tracscript` management tool.
+This guide explains how to back up and restore your Trac environment safely using **tracserve**.
 
----
-
-## 🧠 Overview
-
-`tracscript` automates Trac maintenance with timestamped backups, automatic pruning, and safe restores.  
-Backups include your Trac project environment, configuration, templates, and scripts.
+Backups are fully automated, timestamped, and pruned to keep only the most recent five copies.
 
 ---
 
-## ⚙️ Backup
+## 🧰 Overview
 
-To create a backup:
+tracserve ensures your Trac project and configuration are safely backed up, including:
+
+- Full Trac project environment (configuration, database, templates, plugins)
+- A copy of your `TracConfig` file
+- A copy of the `tracserve` script for version tracking
+
+Your Python virtual environment (`tracenv`) is **not** included in backups.  
+This ensures faster operation and avoids dependency conflicts during restoration.
+
+---
+
+## 📦 Directory Layout
+
+```
+~/Trac/
+├── myproject/               ← Your active Trac environment
+├── tracenv/                 ← Python virtual environment (not backed up)
+├── TracBackups/             ← Backup storage location
+└── TracTools/
+    └── tracserve
+```
+
+---
+
+## 💾 Creating a Backup
+
+To create a new backup, simply run:
 
 ```bash
-tracscript backup
+tracserve backup
 ```
 
-This will:
-
-- Compress your Trac project (`myproject/`)  
-- Include templates, configuration, and the `tracscript` itself  
-- Save the archive under:
+Example output:
 
 ```
-$HOME/Trac/TracBackups/
-```
-
-Backups are named automatically, for example:
-
-```
-20251027-152837-TracBackup.tar.gz
-```
-
----
-
-### 🧹 Automatic Pruning
-
-`tracscript` keeps only the **five most recent backups** and deletes older ones automatically:
-
-```
+🧠 Virtual environment active: /Users/you/tracenv
+💾 Creating backup at ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz ...
+✅ Backup complete!
 🧹 Pruning old backups (keeping 5 most recent)...
+   🗑️  Removing /Users/you/Trac/TracBackups/20251025-121002-TracBackup.tar.gz
+```
+
+Backups are stored as compressed `.tar.gz` files named with a timestamp:
+
+```
+~/Trac/TracBackups/YYYYMMDD-HHMMSS-TracBackup.tar.gz
 ```
 
 ---
 
-## 🔁 Restore
+## ♻️ Restoring a Backup
 
-To restore from a backup archive:
+Restoring is just as simple — use the `restore` command:
 
 ```bash
-tracscript restore $HOME/Trac/TracBackups/20251027-152837-TracBackup.tar.gz
+tracserve restore ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz
 ```
 
-This will:
+Example output:
 
-- Stop Trac (if running)  
-- Extract your environment into the correct project path  
-- Preserve your virtual environment (`tracenv`)  
-- Preserve your management scripts and tools  
+```
+🧠 Virtual environment active: /Users/you/tracenv
+📦 Restoring backup from ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz ...
+✅ Restore complete.
+🚫 Skipped restoring tracenv and tracserve script (safety mode)
+```
+
+### 🧩 Safety Rules
+
+- The restore process does **not** overwrite your `tracserve` script or `tracenv`.  
+- You must stop the Trac server before restoring:
+
+```bash
+tracserve stop
+tracserve restore <backup-file>
+tracserve start
+```
 
 ---
 
-## ⚠️ Notes
+## 🗒️ Notes
 
 | Limitation | Description | Workaround |
 |-------------|--------------|-------------|
-| Trac must be stopped | SQLite locks while active | Use `tracscript stop` before restoring |
-| Virtual environment not restored | Keeps your Python setup safe | Recreate manually if needed |
-| Backup path not found | Directory missing or misconfigured | Verify `BACKUP_PATH` in `TracConfig` |
+| Backup size may vary | Larger databases produce larger `.tar.gz` files | Use external compression utilities if needed |
+| Active Trac instance may lock DB | SQLite may lock the file if Trac is running | Stop Trac before backing up |
+| Retention limited to 5 backups | To prevent disk growth | Adjust limit in script if needed |
 
 ---
 
-**Author:** Bill Stackhouse  
-**Part of:** [TracTools](https://github.com/billsdesk/TracTools)
+## 📚 Related Documentation
+
+- [TracServe Command Reference](TracServe.md)
+- [Installation Guide](InstallationGuide.md)
+- [HTML Email Plugin](HTML_Email_Plugin.md)
