@@ -203,18 +203,50 @@ backup_trac() {
 }
 
 restore_trac() {
-    local file="$1"
-    if [[ -z "$file" || ! -f "$file" ]]; then
-        echo "❌ Backup file not found: $file"
+    activate_venv
+    if [[ $# -lt 1 ]]; then
+        echo "Usage: tracserve restore <backup-file>"
         exit 1
     fi
 
-    echo "🛑 Stop Trac before restoring!"
-    read -rp "⚠️  Continue restore from '$file'? (y/N): " confirm
-    [[ "$confirm" =~ ^[Yy]$ ]] || { echo "❌ Restore cancelled."; exit 0; }
+    local backup_file="$1"
 
-    tar -xzf "$file" -C "$HOME/Trac/" --exclude "tracenv" --exclude "$(basename "$0")"
-    echo "✅ Restore complete."
+    if [[ ! -f "$backup_file" ]]; then
+        echo "❌ Backup file not found: $backup_file"
+        exit 1
+    fi
+
+    echo "🧠 Virtual environment active: $VENV_PATH"
+    echo "♻️  Preparing to restore from backup: $backup_file"
+
+    # Safety prompt
+    echo "⚠️  This will overwrite your current Trac project and configuration."
+    read -r -p "   Continue? (y/N): " confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || { echo "❌ Restore cancelled."; return; }
+
+    # Stop Trac if running
+    if [[ -f "$TRAC_PROJECT_PATH/tracd.pid" ]]; then
+        echo "🛑 Stopping running Trac instance..."
+        kill "$(cat "$TRAC_PROJECT_PATH/tracd.pid")" 2>/dev/null || true
+        rm -f "$TRAC_PROJECT_PATH/tracd.pid"
+    fi
+
+    echo "📦 Extracting backup..."
+    (
+        cd "$HOME" || exit 1
+
+        # Extract safe items only — tracenv is intentionally excluded
+        tar -xzf "$backup_file" --strip-components=0 --no-same-owner \
+            "Trac/myproject" \
+            "Trac/TracConfig" \
+            "bin/tracserve" \
+            >/dev/null 2>&1
+    )
+
+    echo "✅ Restore complete!"
+    echo "💡 Note: tracenv was intentionally NOT restored (for safety)."
+    echo "   You can now restart Trac with:"
+    echo "     ~/bin/tracserve restart"
 }
 
 # ------------------------------------------------------------
