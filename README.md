@@ -17,7 +17,7 @@ A collection of scripts and configuration tools that extend and simplify Trac ad
 
 Includes:
 
-- 🖥️ `tracserve` — command-line manager for start/stop, backup, restore, ticket date edits, and safe ticket deletion  
+- 🖥️ `tracserve` — command-line manager for start/stop, backup, restore, delete, and ticket date edits  
 - ✉️ HTML email notification enhancements  
 - 🗓️ Created-date editor for ticket history preservation  
 
@@ -25,236 +25,143 @@ Includes:
 
 ## ✨ Features
 
-- HTML-formatted ticket notifications  
-- Change ticket **created date(s)** safely  
-- Delete tickets with confirmation or `--force` override  
-- Automated backups (with retention)  
-- Simple restore workflow  
-- Unified action logging (`tracserve.log`)  
+- Start, stop, and restart Trac easily  
+- Change ticket **created date** safely (supports ranges and lists)  
+- Permanently delete tickets with safety checks and logging  
+- Automated backups with retention and restore functions  
 - Local timezone handling  
-- Clean, minimal Bash automation  
+- Lightweight, single-script management (no plugins required)  
 
 ---
 
 ## ⚙️ Requirements
 
-- macOS or Linux  
-- Python ≥ 3.12  
-- Trac 1.6  
-- SQLite backend  
-- Genshi (for HTML templates)  
-- Configured Trac environment (`tracd` compatible)  
+| Component | Version | Notes |
+|------------|----------|--------|
+| macOS / Linux | — | Tested on macOS 14+ |
+| Python | ≥ 3.12 | |
+| Trac | 1.6 | |
+| SQLite | — | Default backend |
+| Genshi | — | For HTML templates |
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# Run from your Trac directory
-tracserve start
-tracserve backup
-tracserve set-created 12 2024-01-05
+# From your Trac environment directory
+~/bin/tracserve start
+~/bin/tracserve backup
+~/bin/tracserve set-created 12-15 2024-01-05
+~/bin/tracserve delete 20,21,22
 ```
 
 ---
 
-## 📂 Recommended Directory Layout
+## 🧩 Components
 
-```text
+| Component | Purpose |
+|------------|----------|
+| `tracserve` | Command-line utility for Trac management (backups, restores, timestamps, deletes) |
+| `html_email_plugin` | Enables HTML-formatted email notifications |
+| `docs/` | Installation, backup, and usage guides |
+
+---
+
+## 📦 Recommended Directory Layout
+
+```
 ~/Trac/
-├── myproject/
+├── myproject/               ← Your Trac environment
 │   ├── conf/
 │   ├── db/
 │   ├── log/
 │   ├── templates/
-│   ├── TracConfig          ← Project config for tracserve
-├── tracenv/                ← Python virtual environment
-├── TracBackups/            ← Automated backups and tracserve.log
-└── TracTools/
-    └── tracserve           ← This script
+│   └── TracConfig
+├── tracenv/                 ← Python virtual environment
+├── TracBackups/             ← Backup directory
+└── bin/                     ← tracserve script location
 ```
+
+> Ensure `~/bin/` is part of your `$PATH` so `tracserve` can be executed from anywhere.
 
 ---
 
-## 🧩 Configuration
-
-`tracserve` reads its settings from:
+## 🧠 Example Workflow
 
 ```bash
-$HOME/Trac/TracConfig
-```
+tracserve restart
 
-Example contents:
-
-```bash
-# Trac configuration for tracserve
-TRAC_PROJECT_PATH=$HOME/Trac/myproject
-VENV_PATH=$HOME/tracenv
-BACKUP_PATH=$HOME/Trac/TracBackups
-PORT=8080
-```
-
-💡 Use `$HOME` instead of `/Users/<name>` for portability.
-
----
-
-## ⚙️ Command Reference
-
-```bash
-Usage: tracserve <command> [options]
-
-Commands:
-  start                          Start the Trac server
-  stop                           Stop the Trac server
-  restart                        Restart the Trac server
-  backup                         Create a timestamped backup (keeps 5 most recent)
-  restore <file>                 Restore a backup (safe mode)
-  set-created <ids> <date>       Update one or more tickets' created date(s)
-  delete [--force|-f] <ids>      Delete one or more tickets (with confirmation)
-  view-log [trac|tracserve] [N]  View either the Trac or tracserve log (default 20 lines)
-  help                           Show this help message
-
-Examples:
-  tracserve set-created 12-14,20 2025-08-01
-  tracserve delete --force 10,11,12
-```
-
----
-
-## 🧠 Virtual Environment Integration
-
-When executing, `tracserve` automatically activates your Trac Python virtual environment.
-
-Example:
-
-```bash
+🔄 Restarting Trac...
+🛑 Stopping Trac...
+✅ Trac stopped.
 🧠 Virtual environment active: /Users/you/tracenv
+🚀 Starting Trac on port 8080...
+✅ Started Trac (PID 81679) → http://127.0.0.1:8080/
 ```
-
-This ensures all commands use the correct `trac-admin`, Trac libraries, and database context.
-
----
-
-## 💾 Backup System
-
-Backups include:
-
-- Your entire Trac environment (`myproject/`)
-- Configuration and templates
-- A copy of your `tracserve` script
-- Retains the 5 most recent backups
-
-Example:
 
 ```bash
 tracserve backup
+
 💾 Creating backup...
-✅ Backup complete: ~/Trac/TracBackups/20251029-152837-TracBackup.tar.gz
+✅ Backup complete: ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz
 ```
-
-Older backups are automatically pruned.
-
----
-
-## 🔁 Restore
-
-Restore a previous backup safely:
 
 ```bash
-tracserve restore ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz
-```
+tracserve set-created 30-34 2025-10-01
 
-This does **not** overwrite:
-- The virtual environment (`tracenv`)
-- The current `tracserve` script
-- Active configuration files
-
----
-
-## 🗓️ Multi-Ticket Date Editing
-
-You can set the “created” date for one or multiple tickets:
-
-```bash
-tracserve set-created 34,35,36 2025-10-01
-tracserve set-created 10-15 2025-09-01
-```
-
-✅ Supports:
-- Comma-separated IDs  
-- Ranges (e.g., `10-15`)  
-- Combined input (`10-12,20,25-28`)
-
-Each change is logged automatically in `tracserve.log`.
-
----
-
-## 🗑️ Safe Ticket Deletion
-
-Delete one or multiple tickets:
-
-```bash
-tracserve delete 35,36
-```
-
-`tracserve` will confirm before deletion unless `--force` is specified:
-
-```bash
-tracserve delete --force 30-34
-```
-
-Deleted tickets and timestamps are recorded in `tracserve.log`.
-
----
-
-## 🪵 Viewing Logs
-
-`tracserve` can display either its own action log or Trac’s main server log.
-
-| Command | Description |
-|----------|-------------|
-| `tracserve view-log` | Show last 20 entries from tracserve log |
-| `tracserve view-log tracserve 100` | Show last 100 entries from tracserve log |
-| `tracserve view-log trac 50` | Show last 50 lines of Trac’s log file |
-
-### Log Locations
-
-| Log | Path | Contents |
-|------|------|-----------|
-| Tracserve Log | `$BACKUP_PATH/tracserve.log` | Ticket deletions, created date changes, and script actions |
-| Trac Log | `$TRAC_PROJECT_PATH/log/trac.log` | Internal Trac operations and plugin events |
-
-Example:
-
-```
-📜 Showing last 40 entries from tracserve log:
-   /Users/bill/Trac/TracBackups/tracserve.log
----------------------------------------------
-2025-10-29 14:10:24 | user=bill | SET-CREATED: ticket #42 → 2025-01-01 09:00:00
-2025-10-29 14:15:01 | user=bill | DELETE: ticket #43
+🧠 Virtual environment active: /Users/you/tracenv
+📝 Setting created date to '2025-10-01 09:00:00' for tickets: 30 31 32 33 34
+✅ Updated ticket #30
+✅ Updated ticket #31
+✅ Updated ticket #32
+✅ Updated ticket #33
+✅ Updated ticket #34
 ```
 
 ---
 
-## ✅ Summary of Enhancements
+## 🪄 Command Reference
 
-| Command | Description |
-|----------|-------------|
-| `tracserve set-created <ids> <YYYY-MM-DD>` | Update ticket “created” date(s) and log the change |
-| `tracserve delete <ids>` | Delete ticket(s) safely and log the deletion |
-| `tracserve view-log [trac\|tracserve] [N]` | View logs from either tracserve or Trac |
-| `tracserve backup` | Create a timestamped backup with automatic retention |
-| `tracserve restore <file>` | Restore safely without overwriting your environment |
+| Task | Command |
+|------|----------|
+| Start Trac | `tracserve start` |
+| Stop Trac | `tracserve stop` |
+| Restart Trac | `tracserve restart` |
+| Create a backup | `tracserve backup` |
+| Restore from backup | `tracserve restore <file>` |
+| Change ticket creation date | `tracserve set-created <id>[,<id2>] <YYYY-MM-DD>` |
+| Delete tickets (with confirmation) | `tracserve delete [--force] <id>[,<id2>]` |
+| View logs | `tracserve view-log trac|tracserve <count>` |
+
+---
+
+## 🧾 Summary
+
+✅ Self-contained Trac management toolkit  
+✅ Safe delete, restore, and modify functions  
+✅ HTML-formatted notifications  
+✅ macOS/Linux friendly Bash scripting  
+✅ Simple, modern command-line interface  
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|-----------|--------------|
+| [TracServe.md](docs/TracServe.md) | Complete command reference |
+| [BackupRestore.md](docs/BackupRestore.md) | Backup and restore usage guide |
+| [HTML_Email_Plugin.md](docs/HTML_Email_Plugin.md) | HTML email notification setup |
+| [InstallationGuide.md](docs/InstallationGuide.md) | Installation and configuration steps |
 
 ---
 
 ## 📄 License
-
-This project is licensed under the BSD 3-Clause License — see `LICENSE.md` for details.
+This project is licensed under the **BSD 3-Clause License** — see LICENSE.md for details.
 
 ---
 
 ## 💬 Author
-
 Developed by **Bill Stackhouse**  
 “Making Trac simpler, faster, and more maintainable.”
