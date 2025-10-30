@@ -49,7 +49,6 @@ Includes:
 ## 🚀 Quick Start
 
 ```bash
-# From your Trac environment directory
 ~/bin/tracserve start
 ~/bin/tracserve backup
 ~/bin/tracserve set-created 12-15 2024-01-05
@@ -85,8 +84,6 @@ Includes:
 └── tracserve                ← Management script (in your PATH)
 ```
 
-> `~/bin/tracserve` is not included in automatic backups.  
-> Keep a copy in version control (e.g., GitHub) or back it up manually.
 
 ---
 
