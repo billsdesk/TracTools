@@ -1,140 +1,76 @@
-# 💾 Backup & Restore — TracServe Utility
 
-This guide explains how to back up and restore your Trac environment safely using **tracserve**.
+## 💾 Backup and Restore
 
-Backups are fully automated, timestamped, and pruned to keep only the most recent five copies.
+`tracserve` includes a simple but powerful backup and restore system that preserves your
+entire Trac project and configuration while protecting your virtual environment (`tracenv`).
 
----
+### 🔒 Safe Backups
 
-## 🧰 Overview
+Backups now store **relative paths** (no `/Volumes/...` nesting) so they can be restored
+cleanly on any machine.
 
-tracserve ensures your Trac project and configuration are safely backed up, including:
+Each backup archive includes:
+- `Trac/myproject` — your full Trac environment (database, attachments, config)
+- `Trac/TracConfig` — script configuration file
+- `bin/tracserve` — a copy of the running management script for version traceability
+- *(optionally)* `Trac/tracenv` — only if you choose to include it manually
 
-- Full Trac project environment (configuration, database, templates, plugins)
-- A copy of your `TracConfig` file
-- A copy of the `tracserve` script for version tracking
-
-Your Python virtual environment (`tracenv`) is **not** included in backups.  
-This ensures faster operation and avoids dependency conflicts during restoration.
-
----
-
-## 📦 Directory Layout
-
-```
-~/Trac/
-├── myproject/               ← Your Trac environment
-│   ├── conf/
-│   ├── db/
-│   ├── log/
-│   ├── templates/
-│   └── TracConfig
-├── tracenv/                 ← Python virtual environment
-└── TracBackups/             ← Backup directory
-
-~/bin/
-└── tracserve                ← Management script (in your PATH)
-```
-
-
----
-
-## 💾 Creating a Backup
-
-To create a new backup, simply run:
-
+Example command:
 ```bash
 tracserve backup
 ```
 
-Example output:
-
+Output:
 ```
-🧠 Virtual environment active: /Users/you/tracenv
-💾 Creating backup at ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz ...
+💾 Creating backup at ~/Trac/TracBackups/20251030-150153-TracBackup.tar.gz ...
 ✅ Backup complete!
 🧹 Pruning old backups (keeping 5 most recent)...
-   🗑️  Removing /Users/you/Trac/TracBackups/20251025-121002-TracBackup.tar.gz
 ```
 
-Backups are stored as compressed `.tar.gz` files named with a timestamp:
-
+Backups are stored in:
 ```
-~/Trac/TracBackups/YYYYMMDD-HHMMSS-TracBackup.tar.gz
+~/Trac/TracBackups/
 ```
+and automatically rotated, keeping only the 5 most recent.
 
 ---
 
-## ♻️ Restoring a Backup
+### ♻️ Restoring from Backup
 
-Restoring is just as simple — use the `restore` command:
+Restores are **safe and non-destructive** — `tracenv` is never overwritten.
 
+Example:
 ```bash
-tracserve restore ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz
+tracserve restore ~/Trac/TracBackups/20251030-150153-TracBackup.tar.gz
 ```
+
+During restore, `tracserve`:
+1. Stops any running Trac instance (via PID file).  
+2. Extracts the selected backup relative to your home directory (`~/Trac/...`).  
+3. Skips `Trac/tracenv` entirely for safety.  
+4. Restores `myproject`, `TracConfig`, and `bin/tracserve`.  
 
 Example output:
-
 ```
-🧠 Virtual environment active: /Users/you/tracenv
-📦 Restoring backup from ~/Trac/TracBackups/20251027-152837-TracBackup.tar.gz ...
-✅ Restore complete.
-🚫 Skipped restoring tracenv and tracserve script (safety mode)
-```
-
-### 🧩 Safety Rules
-
-- The restore process does **not** overwrite your `tracserve` script or `tracenv`.  
-- You must stop the Trac server before restoring:
-
-```bash
-tracserve stop
-tracserve restore <backup-file>
-tracserve start
+♻️  Preparing to restore from backup: ~/Trac/TracBackups/20251030-150153-TracBackup.tar.gz
+🛑 Stopping running Trac instance...
+📦 Extracting backup...
+✅ Restore complete!
+💡 Note: tracenv was intentionally NOT restored (for safety).
 ```
 
 ---
 
-## 🗒️ Notes
+### 🧠 Notes
 
-| Limitation | Description | Workaround |
-|-------------|--------------|-------------|
-| Backup size may vary | Larger databases produce larger `.tar.gz` files | Use external compression utilities if needed |
-| Active Trac instance may lock DB | SQLite may lock the file if Trac is running | Stop Trac before backing up |
-| Retention limited to 5 backups | To prevent disk growth | Adjust limit in script if needed |
+| Behavior | Description |
+|-----------|--------------|
+| **Relative paths** | Backups now use relative paths from `~/`, avoiding `/Volumes/...` nesting. |
+| **Safe restores** | Restores do not overwrite the virtual environment. |
+| **Version capture** | Each backup includes a copy of the `tracserve` script. |
+| **Automatic pruning** | Only the 5 newest backups are retained. |
 
----
-
-# 💾 Backup and Restore Behavior
-
-Backups created by `tracserve backup` include all essential Trac components for a complete local restore.
-
-| Item | Included in Backup | Restored | Destination | Notes |
-|------|--------------------|-----------|--------------|-------|
-| `Trac/myproject/` | ✅ | ✅ | `~/Trac/myproject/` | Core Trac project files, database, attachments, etc. |
-| `Trac/TracConfig` | ✅ | ✅ | `~/Trac/TracConfig` | Trac configuration used by `tracserve` |
-| `Trac/bin/tracserve` | ✅ | ✅ | `~/bin/tracserve` | CLI tool is restored directly into your PATH for convenience |
-| `Trac/tracenv/` | ✅ | 🚫 | *(not restored)* | Skipped for safety — prevents Python venv conflicts |
-| `tracserve.log` | 🚫 | 🚫 | *(ignored)* | Runtime log, not needed for restore |
-
-After a restore, you can immediately restart Trac using:
-
+💡 *To restart Trac after restoring:*
 ```bash
-tracserve restart
+~/bin/tracserve restart
 ```
-
-💡 **Tip:**  
-If you prefer to keep `tracserve` self-contained, you can move it manually:
-
-```bash
-mv ~/bin/tracserve ~/Trac/bin/tracserve
-ln -sf ~/Trac/bin/tracserve ~/bin/tracserve
-```
-
-This preserves the documented GitHub layout while maintaining easy command-line access.
-
-## 📚 Related Documentation
-
-- [TracServe Command Reference](TracServe.md)
-- [Installation Guide](InstallationGuide.md)
-- [HTML Email Plugin](HTML_Email_Plugin.md)
